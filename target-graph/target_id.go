@@ -23,6 +23,12 @@ func createTargetId(pkg, task string) string {
 }
 
 // getPackageAndTask returns the package and task from a targetId.
+//
+// For example
+//
+//	getPackageAndTask("hello#build")
+//
+// Will return hello and build
 func getPackageAndTask(targetId string) (error, string, string) {
 	if !strings.Contains(targetId, "#") {
 		return errors.New("Invalid targetId"), "", ""

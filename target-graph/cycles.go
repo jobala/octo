@@ -16,7 +16,7 @@ func dfs(graph map[string]*Target, currNode string, visited []string) (bool, []s
 		return true, visited
 	}
 
-	// avoid adding the starting node to the visited nodes path. The starting node is a placeholder node
+	// Avoid adding the starting node to the visited nodes path. The starting node is a placeholder node
 	if currNode != START_TARGET_ID {
 		visited = append(visited, currNode)
 	}
