@@ -3,8 +3,13 @@ package targetgraph
 import "fmt"
 
 func NewTargetGraph() *TargetGraph {
+
 	return &TargetGraph{
-		targets: make(map[string]*Target),
+		targets: map[string]*Target{
+			START_TARGET_ID: {
+				Id: START_TARGET_ID,
+			},
+		},
 	}
 }
 
@@ -19,19 +24,9 @@ func NewTarget(pkg, task string) *Target {
 	}
 }
 
-func NewStartNode() *Target {
-	return &Target{
-		Id:               START_TARGET_ID,
-		Cwd:              "",
-		Task:             START_TARGET_ID,
-		TaskDependencies: []string{},
-		Dependencies:     []string{},
-		Dependents:       []string{},
-	}
-}
-
 func (t *TargetGraph) addTarget(target *Target) {
 	t.targets[target.Id] = target
+	t.addDependency(target.Id, START_TARGET_ID)
 }
 
 func (t *TargetGraph) addDependency(dependency, dependent string) {
@@ -53,8 +48,41 @@ func (t *TargetGraph) build() (error, map[string]*Target) {
 	return nil, t.targets
 }
 
-func (t *TargetGraph) subgraph() {
+func (t *TargetGraph) subgraph(ids []string) (error, *TargetGraph) {
+	subGraph := NewTargetGraph()
 
+	for _, targetId := range ids {
+		if _, presentInSubgraph := subGraph.targets[targetId]; !presentInSubgraph {
+			// Create a copy of a target to avoid unintentional modification of targets in the main graph
+			target := *t.targets[targetId]
+
+			target.Dependencies = []string{}
+			target.Dependents = []string{}
+
+			subGraph.addTarget(&target)
+		}
+	}
+
+	for _, targetId := range ids {
+		t.populateSubgraph(subGraph, targetId, []string{})
+	}
+
+	return nil, subGraph
+}
+
+func (t *TargetGraph) populateSubgraph(subGraph *TargetGraph, targetId string, path []string) {
+	for _, neighbour := range t.targets[targetId].Dependencies {
+		if _, presentInSubgraph := subGraph.targets[neighbour]; !presentInSubgraph {
+			// Create a copy of a target to avoid unintentional modification of targets in the main graph
+			target := *t.targets[neighbour]
+
+			target.Dependencies = []string{}
+			target.Dependents = []string{}
+
+			subGraph.addTarget(&target)
+		}
+		subGraph.addDependency(neighbour, targetId)
+	}
 }
 
 type TargetGraph struct {
