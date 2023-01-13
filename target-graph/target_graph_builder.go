@@ -18,13 +18,18 @@ func NewTarget(pkg, task string) *Target {
 		Id:               createTargetId(pkg, task),
 		Cwd:              "",
 		Task:             task,
+		Type:             "",
 		TaskDependencies: []string{},
 		Dependencies:     []string{},
 		Dependents:       []string{},
+		Inputs:           []string{},
+		Outputs:          []string{},
+		Cache:            false,
 	}
 }
 
 func (t *TargetGraph) addTarget(target *Target) {
+	fmt.Println(target)
 	t.targets[target.Id] = target
 	t.addDependency(target.Id, START_TARGET_ID)
 }
@@ -74,7 +79,7 @@ func (t *TargetGraph) populateSubgraph(subGraph *TargetGraph, targetId string, p
 	for _, neighbour := range t.targets[targetId].Dependencies {
 		if _, presentInSubgraph := subGraph.targets[neighbour]; !presentInSubgraph {
 			// Create a copy of a target to avoid unintentional modification of targets in the main graph
-			target := *t.targets[neighbour]
+			target := *t.targets[targetId]
 
 			target.Dependencies = []string{}
 			target.Dependents = []string{}
@@ -94,6 +99,7 @@ type Target struct {
 	Id   string
 	Cwd  string
 	Task string
+	Type string
 
 	// TaskDependencies is a list of task dependencies like "^build", "build"
 	TaskDependencies []string
@@ -103,4 +109,10 @@ type Target struct {
 
 	// Dependents are targets that depend on this target
 	Dependents []string
+
+	Inputs []string
+
+	Outputs []string
+
+	Cache bool
 }

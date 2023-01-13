@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestTargetGraph_BuildsAFullGraph(t *testing.T) {
+func TestTargetGraph_BuildFullGraph(t *testing.T) {
 	targetA := NewTarget("a", "build")
 	targetB := NewTarget("b", "build")
 
@@ -24,7 +24,7 @@ func TestTargetGraph_BuildsAFullGraph(t *testing.T) {
 	assert.Contains(t, graph["a#build"].Dependents, "b#build")
 }
 
-func TestTargetGraph_BuildsASubgraph(t *testing.T) {
+func TestTargetGraph_BuildSubgraph(t *testing.T) {
 	targetA := NewTarget("a", "build")
 	targetB := NewTarget("b", "build")
 	targetC := NewTarget("c", "build")
@@ -44,4 +44,5 @@ func TestTargetGraph_BuildsASubgraph(t *testing.T) {
 
 	assert.Contains(t, graph.targets[START_TARGET_ID].Dependencies, "a#build")
 	assert.Contains(t, graph.targets["a#build"].Dependencies, "d#build")
+	assert.Equal(t, len(graph.targets["d#build"].Dependencies), 0)
 }
