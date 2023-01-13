@@ -8,14 +8,20 @@ import (
 )
 
 type WorkspaceTargetGraph struct {
-	dependencyMap workspace.DependencyMap
+	dependencyMap *workspace.DependencyMap
 	targetGraph   *TargetGraph
 	targetFactory TargetFactory
 }
 
 func NewWorkspaceTargetGraph(root string, pkgInfos workspace.PackageInfos) *WorkspaceTargetGraph {
+	depMap := workspace.NewDependencyMap()
+	depMap.CreateDependencyMap(pkgInfos, workspace.PackageDepsOptions{
+		WithDevDependencies: true,
+		WithPeerDependecies: false,
+	})
+
 	return &WorkspaceTargetGraph{
-		dependencyMap: createDependencyMap(root, pkgInfos),
+		dependencyMap: depMap,
 		targetGraph:   NewTargetGraph(),
 		targetFactory: NewTargetFactory(root, func(pkgName string) string {
 			return filepath.Dir(fmt.Sprint("%", pkgInfos[pkgName].PackageJsonPath))
