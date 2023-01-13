@@ -13,9 +13,4 @@ type PackageInfo struct {
 	Repository       string
 }
 
-type DependencyMap struct {
-	Dependencies map[string]string
-	Dependents   map[string]string
-}
-
 type PackageInfos = map[string]PackageInfo
