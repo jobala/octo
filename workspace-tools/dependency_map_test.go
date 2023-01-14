@@ -32,7 +32,7 @@ func TestCreateDependencyMap(t *testing.T) {
 	}
 
 	dm := NewDependencyMap()
-	dm.createDependencyMap(pkgInfos, pkgOptions)
+	dm.CreateDependencyMap(pkgInfos, pkgOptions)
 
 	assert.Contains(t, dm.Dependencies["pkgA"], "pkgB")
 	assert.Contains(t, dm.Dependencies["pkgA"], "pkgC")

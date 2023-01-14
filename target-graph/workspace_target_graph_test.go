@@ -4,23 +4,22 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/jobala/octo/workspace-tools"
 	workspacetools "github.com/jobala/octo/workspace-tools"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestWorkspaceTargetGraph_BuildFromPackageAndTaskGraphs(t *testing.T) {
 	root := "repos/a"
-	packageInfos := createPackageInfo(map[string][]string{
-		"a": {"b"},
+	packageInfos := createPackageInfo(map[string]workspace.Dependency{
+		"a": {"b": "10"},
 		"b": {},
 	})
 
 	workspaceGraph := NewWorkspaceTargetGraph(root, packageInfos)
-	workspaceGraph.addTargetConfig("build", map[string][]string{
-		"dependsOn": {"^build"},
-	})
+	workspaceGraph.AddTargetConfig("build", TargetConfig{DependsOn: []string{"^build"}})
 
-	targetGraph := workspaceGraph.build([]string{"build"})
+	targetGraph := workspaceGraph.Build([]string{"build"}, nil)
 
 	assert.Contains(t, targetGraph["__start"].dependencies, "a#build")
 	assert.Contains(t, targetGraph["__start"].dependencies, "b#build")
@@ -28,7 +27,7 @@ func TestWorkspaceTargetGraph_BuildFromPackageAndTaskGraphs(t *testing.T) {
 	assert.Equal(t, len(targetGraph["b#build"].dependencies), 0)
 }
 
-func createPackageInfo(packages map[string][]string) workspacetools.PackageInfos {
+func createPackageInfo(packages map[string]workspacetools.Dependency) workspacetools.PackageInfos {
 	var res workspacetools.PackageInfos
 
 	for pkgId, dependencies := range packages {

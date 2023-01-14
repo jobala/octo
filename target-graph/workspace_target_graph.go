@@ -8,9 +8,10 @@ import (
 )
 
 type WorkspaceTargetGraph struct {
-	dependencyMap *workspace.DependencyMap
-	targetGraph   *TargetGraph
-	targetFactory TargetFactory
+	DependencyMap *workspace.DependencyMap
+	Graph         *TargetGraph
+	Factory       TargetFactory
+	PkgInfos      workspace.PackageInfos
 }
 
 func NewWorkspaceTargetGraph(root string, pkgInfos workspace.PackageInfos) *WorkspaceTargetGraph {
@@ -21,10 +22,24 @@ func NewWorkspaceTargetGraph(root string, pkgInfos workspace.PackageInfos) *Work
 	})
 
 	return &WorkspaceTargetGraph{
-		dependencyMap: depMap,
-		targetGraph:   NewTargetGraph(),
-		targetFactory: NewTargetFactory(root, func(pkgName string) string {
+		DependencyMap: depMap,
+		Graph:         NewTargetGraph(),
+		Factory: NewTargetFactory(root, func(pkgName string) string {
 			return filepath.Dir(fmt.Sprint("%", pkgInfos[pkgName].PackageJsonPath))
 		}),
+		PkgInfos: pkgInfos,
 	}
+}
+
+func (w WorkspaceTargetGraph) AddTargetConfig(id string, config TargetConfig) {
+	for pkg := range w.PkgInfos {
+		task := id
+		target := w.Factory.createPackageTarget(pkg, task, config)
+		w.Graph.addTarget(target)
+	}
+}
+
+// Build creates a scoped target graph for given tasks and packages
+func (w WorkspaceTargetGraph) Build(tasks []string, scopes []string) {
+	fullDependencies := expandDepSpecs(w.Graph.targets, w.DependencyMap)
 }

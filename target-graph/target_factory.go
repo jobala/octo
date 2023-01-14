@@ -16,10 +16,14 @@ func (tf TargetFactory) createPackageTarget(pkgName, task string, config TargetC
 	return &Target{
 		Id:               createTargetId(pkgName, task),
 		Cwd:              filepath.Dir(tf.options.resolve(pkgName)),
+		Task:             task,
+		Type:             config.Type,
 		Inputs:           config.Inputs,
 		Outputs:          config.Outputs,
 		Cache:            IF(config.Cache == true),
 		TaskDependencies: config.DependsOn,
+		Dependencies:     make([]string, 0),
+		Dependents:       make([]string, 0),
 	}
 }
 
