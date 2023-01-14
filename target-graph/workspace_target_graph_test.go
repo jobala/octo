@@ -22,8 +22,6 @@ func TestWorkspaceTargetGraph_BuildFromPackageAndTaskGraphs(t *testing.T) {
 
 	targetGraph := workspaceGraph.Build([]string{"test"}, nil)
 
-	fmt.Printf("%v", targetGraph["a#build"])
-
 	assert.Contains(t, targetGraph["__start"].Dependencies, "a#build")
 	assert.Contains(t, targetGraph["__start"].Dependencies, "b#build")
 	assert.Contains(t, targetGraph["a#build"].Dependencies, "b#build")
