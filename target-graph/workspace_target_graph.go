@@ -40,7 +40,21 @@ func (w WorkspaceTargetGraph) AddTargetConfig(id string, config TargetConfig) {
 }
 
 // Build creates a scoped target graph for given tasks and packages
-func (w WorkspaceTargetGraph) Build(tasks []string, scopes []string) {
+func (w WorkspaceTargetGraph) Build(tasks []string, scopes []string) map[string]*Target {
 	fullDependencies := expandDepSpecs(w.Graph.targets, w.DependencyMap)
-	fmt.Println(fullDependencies)
+
+	for _, rel := range fullDependencies {
+		child, parent := rel[0], rel[1]
+		w.Graph.addDependency(child, parent)
+	}
+
+	subGraphEntries := make([]string, 0)
+	for _, task := range tasks {
+		for pkg := range w.PkgInfos {
+			subGraphEntries = append(subGraphEntries, createTargetId(pkg, task))
+		}
+	}
+
+	_, subGraph := w.Graph.subgraph(subGraphEntries)
+	return subGraph.targets
 }

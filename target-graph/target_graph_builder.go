@@ -19,11 +19,11 @@ func NewTarget(pkg, task string) *Target {
 		Cwd:              "",
 		Task:             task,
 		Type:             "",
-		TaskDependencies: []string{},
-		Dependencies:     []string{},
-		Dependents:       []string{},
-		Inputs:           []string{},
-		Outputs:          []string{},
+		TaskDependencies: make([]string, 0),
+		Dependencies:     make([]string, 0),
+		Dependents:       make([]string, 0),
+		Inputs:           make([]string, 0),
+		Outputs:          make([]string, 0),
 		Cache:            false,
 	}
 }
@@ -34,6 +34,7 @@ func (t *TargetGraph) addTarget(target *Target) {
 }
 
 func (t *TargetGraph) addDependency(dependency, dependent string) {
+
 	parent := t.targets[dependent]
 	child := t.targets[dependency]
 
@@ -60,8 +61,8 @@ func (t *TargetGraph) subgraph(ids []string) (error, *TargetGraph) {
 			// Create a copy of a target to avoid unintentional modification of targets in the main graph
 			target := *t.targets[targetId]
 
-			target.Dependencies = []string{}
-			target.Dependents = []string{}
+			target.Dependencies = make([]string, 0)
+			target.Dependents = make([]string, 0)
 
 			subGraph.addTarget(&target)
 		}
@@ -75,10 +76,16 @@ func (t *TargetGraph) subgraph(ids []string) (error, *TargetGraph) {
 }
 
 func (t *TargetGraph) populateSubgraph(subGraph *TargetGraph, targetId string, path []string) {
+	if contains(path, targetId) {
+		return
+	}
+
+	path = append(path, targetId)
+
 	for _, neighbour := range t.targets[targetId].Dependencies {
 		if _, presentInSubgraph := subGraph.targets[neighbour]; !presentInSubgraph {
 			// Create a copy of a target to avoid unintentional modification of targets in the main graph
-			target := *t.targets[targetId]
+			target := *t.targets[neighbour]
 
 			target.Dependencies = []string{}
 			target.Dependents = []string{}
@@ -86,6 +93,8 @@ func (t *TargetGraph) populateSubgraph(subGraph *TargetGraph, targetId string, p
 			subGraph.addTarget(&target)
 		}
 		subGraph.addDependency(neighbour, targetId)
+
+		t.populateSubgraph(subGraph, neighbour, path)
 	}
 }
 
