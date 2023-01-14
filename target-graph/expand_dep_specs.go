@@ -18,17 +18,17 @@ func expandDepSpecs(targets map[string]*Target, depMap *workspace.DependencyMap)
 		}
 
 		for _, taskName := range depSpecs {
-			task := string(taskName[1:])
 			targetDependencies := depMap.Dependencies[target.PkgName]
 
 			if string(taskName[0]) == "^" {
+				task := string(taskName[1:])
 				dependencyTargetIds := findDependenciesByTask(task, targetDependencies, targets)
 				for _, dep := range dependencyTargetIds {
 					dependencies = append(dependencies, []string{dep, parentNodeId})
 				}
 			} else if pkgName != "" {
-				if _, ok := targets[createTargetId(pkgName, task)]; ok {
-					dependencies = append(dependencies, []string{createTargetId(pkgName, task), parentNodeId})
+				if _, ok := targets[createTargetId(pkgName, taskName)]; ok {
+					dependencies = append(dependencies, []string{createTargetId(pkgName, taskName), parentNodeId})
 				}
 			}
 		}
