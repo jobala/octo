@@ -42,4 +42,5 @@ func (w WorkspaceTargetGraph) AddTargetConfig(id string, config TargetConfig) {
 // Build creates a scoped target graph for given tasks and packages
 func (w WorkspaceTargetGraph) Build(tasks []string, scopes []string) {
 	fullDependencies := expandDepSpecs(w.Graph.targets, w.DependencyMap)
+	fmt.Println(fullDependencies)
 }

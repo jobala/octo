@@ -29,7 +29,6 @@ func NewTarget(pkg, task string) *Target {
 }
 
 func (t *TargetGraph) addTarget(target *Target) {
-	fmt.Println(target)
 	t.targets[target.Id] = target
 	t.addDependency(target.Id, START_TARGET_ID)
 }
@@ -96,10 +95,11 @@ type TargetGraph struct {
 
 type Target struct {
 	// Id is the target's identifier of the form package#task
-	Id   string
-	Cwd  string
-	Task string
-	Type string
+	Id      string
+	Cwd     string
+	Task    string
+	Type    string
+	PkgName string
 
 	// TaskDependencies is a list of task dependencies like "^build", "build"
 	TaskDependencies []string

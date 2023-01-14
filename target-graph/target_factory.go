@@ -15,6 +15,7 @@ func (tf TargetFactory) createPackageTarget(pkgName, task string, config TargetC
 	// TODO: make Target a value type
 	return &Target{
 		Id:               createTargetId(pkgName, task),
+		PkgName:          pkgName,
 		Cwd:              filepath.Dir(tf.options.resolve(pkgName)),
 		Task:             task,
 		Type:             config.Type,
