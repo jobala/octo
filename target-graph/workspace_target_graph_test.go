@@ -19,7 +19,7 @@ func TestWorkspaceTargetGraph_BuildFromPackageAndTaskGraphs(t *testing.T) {
 	workspaceGraph := NewWorkspaceTargetGraph(root, packageInfos)
 	workspaceGraph.AddTargetConfig("build", TargetConfig{DependsOn: []string{"^build"}})
 
-	targetGraph := workspaceGraph.Build([]string{"test"}, nil)
+	targetGraph := workspaceGraph.Build([]string{"build"}, nil)
 
 	assert.Contains(t, targetGraph["__start"].Dependencies, "a#build")
 	assert.Contains(t, targetGraph["__start"].Dependencies, "b#build")
