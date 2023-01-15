@@ -8,15 +8,17 @@ func detectCyclesIn(graph map[string]*Target) cycleInfo {
 	}
 }
 
+// dfs traverses the graph in a depth first manner tracking the nodes visited
+// and checking if the graph is cyclic
 func dfs(graph map[string]*Target, currNode string, visited []string) (bool, []string) {
 
-	// If we have visited this node before then we are in a cyclic graph
+	// If the currNode had been visited before then the graph is cyclic
 	if contains(visited, currNode) {
 		visited = append(visited, currNode)
 		return true, visited
 	}
 
-	// Avoid adding the starting node to the visited nodes path. The starting node is a placeholder node
+	// Ignore the START_TARGET_ID from the visited path because it is a placeholder node
 	if currNode != START_TARGET_ID {
 		visited = append(visited, currNode)
 	}
@@ -34,8 +36,8 @@ func pop[T any](items []T) []T {
 }
 
 func contains(items []string, item string) bool {
-	for _, k := range items {
-		if k == item {
+	for _, element := range items {
+		if element == item {
 			return true
 		}
 	}

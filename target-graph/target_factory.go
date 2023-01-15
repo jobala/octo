@@ -48,7 +48,7 @@ type TargetConfig struct {
 	// Type can be one of npmScript, worker etc
 	Type string
 
-	// DependsOn are the target's dependencies of the form pkg#task, build, ^build
+	// DependsOn are the target's dependencies of the form task or ^task
 	DependsOn []string
 
 	// Inputs are used to determine the target's cache key

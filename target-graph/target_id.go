@@ -8,7 +8,7 @@ import (
 
 const START_TARGET_ID = "__start"
 
-// createTargetId creates an id from the npm package's name and the task the target runs
+// createTargetId creates a target node id from the npm package name and the task the target runs
 //
 // For example
 //
@@ -31,7 +31,7 @@ func createTargetId(pkg, task string) string {
 // Will return hello and build
 func getPackageAndTask(targetId string) (error, string, string) {
 	if !strings.Contains(targetId, "#") {
-		return errors.New("Invalid targetId"), "", ""
+		return errors.New("invalid targetId"), "", ""
 	}
 
 	id := strings.Split(targetId, "#")
