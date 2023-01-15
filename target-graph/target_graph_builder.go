@@ -30,11 +30,11 @@ func NewTarget(pkg, task string) *Target {
 // addTarget adds a node to the target graph
 func (t *TargetGraph) addTarget(target *Target) {
 	t.targets[target.Id] = target
-	t.addDependency(target.Id, START_TARGET_ID)
+	t.addDependency(START_TARGET_ID, target.Id)
 }
 
 // addDependency creates an edge between two  nodes in the target graph
-func (t *TargetGraph) addDependency(child, parent string) {
+func (t *TargetGraph) addDependency(parent, child string) {
 	parentNode := t.targets[parent]
 	childNode := t.targets[child]
 
@@ -53,7 +53,7 @@ func (t *TargetGraph) build() (error, map[string]*Target) {
 	return nil, t.targets
 }
 
-// subgraph creates a smaller target graph from the passed ids
+// subgraph creates a smaller target graph from the passed target ids
 func (t *TargetGraph) subgraph(ids []string) (error, *TargetGraph) {
 	subGraph := NewTargetGraph()
 
@@ -87,16 +87,16 @@ func (t *TargetGraph) populateSubgraph(subGraph *TargetGraph, targetId string, p
 
 	for _, neighbour := range t.targets[targetId].Dependencies {
 		if _, presentInSubgraph := subGraph.targets[neighbour]; !presentInSubgraph {
+
 			// Create a copy of a target to avoid unintentional modification of targets in the main graph
 			target := *t.targets[neighbour]
-
 			target.Dependencies = []string{}
 			target.Dependents = []string{}
 
 			subGraph.addTarget(&target)
 		}
-		subGraph.addDependency(neighbour, targetId)
 
+		subGraph.addDependency(targetId, neighbour)
 		t.populateSubgraph(subGraph, neighbour, path)
 	}
 }

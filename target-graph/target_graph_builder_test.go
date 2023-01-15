@@ -15,7 +15,7 @@ func TestTargetGraph_BuildFullGraph(t *testing.T) {
 	targetGraph.addTarget(targetB)
 
 	// targetA is a dependency of targetB
-	targetGraph.addDependency(targetA.Id, targetB.Id)
+	targetGraph.addDependency(targetB.Id, targetA.Id)
 
 	err, graph := targetGraph.build()
 	assert.NoError(t, err)
@@ -36,9 +36,9 @@ func TestTargetGraph_BuildSubgraph(t *testing.T) {
 	targetGraph.addTarget(targetC)
 	targetGraph.addTarget(targetD)
 
-	targetGraph.addDependency(targetA.Id, targetB.Id)
-	targetGraph.addDependency(targetA.Id, targetC.Id)
-	targetGraph.addDependency(targetD.Id, targetA.Id)
+	targetGraph.addDependency(targetB.Id, targetA.Id)
+	targetGraph.addDependency(targetC.Id, targetA.Id)
+	targetGraph.addDependency(targetA.Id, targetD.Id)
 
 	_, graph := targetGraph.subgraph([]string{"a#build"})
 

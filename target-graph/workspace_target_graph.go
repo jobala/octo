@@ -45,7 +45,7 @@ func (w WorkspaceTargetGraph) Build(tasks []string, scopes []string) map[string]
 
 	for _, rel := range fullDependencies {
 		child, parent := rel[0], rel[1]
-		w.Graph.addDependency(child, parent)
+		w.Graph.addDependency(parent, child)
 	}
 
 	subGraphEntries := make([]string, 0)
