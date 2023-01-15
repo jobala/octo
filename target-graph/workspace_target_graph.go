@@ -31,15 +31,15 @@ func NewWorkspaceTargetGraph(root string, pkgInfos workspace.PackageInfos) *Work
 	}
 }
 
-func (w WorkspaceTargetGraph) AddTargetConfig(id string, config TargetConfig) {
+func (w WorkspaceTargetGraph) AddTargetConfig(task string, config TargetConfig) {
 	for pkg := range w.PkgInfos {
-		task := id
 		target := w.Factory.createPackageTarget(pkg, task, config)
 		w.Graph.addTarget(target)
 	}
 }
 
 // Build creates a scoped target graph for given tasks and packages
+// TODO: add support for scopes
 func (w WorkspaceTargetGraph) Build(tasks []string, scopes []string) map[string]*Target {
 	fullDependencies := expandDepSpecs(w.Graph.targets, w.DependencyMap)
 

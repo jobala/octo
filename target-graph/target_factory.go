@@ -12,7 +12,6 @@ func NewTargetFactory(root string, resolve func(string) string) TargetFactory {
 }
 
 func (tf TargetFactory) createPackageTarget(pkgName, task string, config TargetConfig) *Target {
-	// TODO: make Target a value type
 	return &Target{
 		Id:               createTargetId(pkgName, task),
 		PkgName:          pkgName,

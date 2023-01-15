@@ -3,7 +3,6 @@ package targetgraph
 import "fmt"
 
 func NewTargetGraph() *TargetGraph {
-
 	return &TargetGraph{
 		targets: map[string]*Target{
 			START_TARGET_ID: {
@@ -19,27 +18,28 @@ func NewTarget(pkg, task string) *Target {
 		Cwd:              "",
 		Task:             task,
 		Type:             "",
-		TaskDependencies: make([]string, 0),
-		Dependencies:     make([]string, 0),
-		Dependents:       make([]string, 0),
-		Inputs:           make([]string, 0),
-		Outputs:          make([]string, 0),
+		TaskDependencies: []string{},
+		Dependencies:     []string{},
+		Dependents:       []string{},
+		Inputs:           []string{},
+		Outputs:          []string{},
 		Cache:            false,
 	}
 }
 
+// addTarget adds a node to the target graph
 func (t *TargetGraph) addTarget(target *Target) {
 	t.targets[target.Id] = target
 	t.addDependency(target.Id, START_TARGET_ID)
 }
 
-func (t *TargetGraph) addDependency(dependency, dependent string) {
+// addDependency creates an edge between two  nodes in the target graph
+func (t *TargetGraph) addDependency(child, parent string) {
+	parentNode := t.targets[parent]
+	childNode := t.targets[child]
 
-	parent := t.targets[dependent]
-	child := t.targets[dependency]
-
-	parent.Dependencies = append(parent.Dependencies, child.Id)
-	child.Dependents = append(child.Dependents, parent.Id)
+	parentNode.Dependencies = append(parentNode.Dependencies, childNode.Id)
+	childNode.Dependents = append(childNode.Dependents, parentNode.Id)
 }
 
 func (t *TargetGraph) build() (error, map[string]*Target) {
@@ -53,11 +53,13 @@ func (t *TargetGraph) build() (error, map[string]*Target) {
 	return nil, t.targets
 }
 
+// subgraph creates a smaller target graph from the passed ids
 func (t *TargetGraph) subgraph(ids []string) (error, *TargetGraph) {
 	subGraph := NewTargetGraph()
 
 	for _, targetId := range ids {
 		if _, presentInSubgraph := subGraph.targets[targetId]; !presentInSubgraph {
+
 			// Create a copy of a target to avoid unintentional modification of targets in the main graph
 			target := *t.targets[targetId]
 
@@ -75,6 +77,7 @@ func (t *TargetGraph) subgraph(ids []string) (error, *TargetGraph) {
 	return nil, subGraph
 }
 
+// populateSubgraph recursively adds dependencies for subgraph nodes
 func (t *TargetGraph) populateSubgraph(subGraph *TargetGraph, targetId string, path []string) {
 	if contains(path, targetId) {
 		return
