@@ -6,28 +6,35 @@ func expandDepSpecs(targets map[string]*Target, depMap *workspace.DependencyMap)
 	dependencies := make([][]string, 0)
 
 	for _, target := range targets {
-		depSpecs := target.TaskDependencies
+		tasks := target.TaskDependencies
 		pkgName := target.PkgName
 		parentNodeId := target.Id
 
-		// all parent nodes are children of the START_TARGET_ID node
+		// All nodes are children of the START_TARGET_ID node
 		dependencies = append(dependencies, []string{parentNodeId, START_TARGET_ID})
 
-		if len(depSpecs) == 0 {
+		if len(tasks) == 0 {
 			continue
 		}
 
-		for _, taskName := range depSpecs {
-			targetDependencies := depMap.Dependencies[target.PkgName]
+		for _, taskName := range tasks {
 
-			if string(taskName[0]) == "^" {
+			// topoligical dependencies
+			targetDependencies := depMap.Dependencies[target.PkgName]
+			isTopologicalDependency := string(taskName[0]) == "^"
+
+			if isTopologicalDependency {
 				task := string(taskName[1:])
+
+				// Find all targets that are a dependency of the current target node and executes the current task
 				dependencyTargetIds := findDependenciesByTask(task, targetDependencies, targets)
 				for _, dep := range dependencyTargetIds {
 					dependencies = append(dependencies, []string{dep, parentNodeId})
 				}
-			} else if pkgName != "" {
-				if _, ok := targets[createTargetId(pkgName, taskName)]; ok {
+			} else {
+				targetNodeId := createTargetId(pkgName, taskName)
+
+				if _, nodeExists := targets[targetNodeId]; nodeExists {
 					dependencies = append(dependencies, []string{createTargetId(pkgName, taskName), parentNodeId})
 				}
 			}
@@ -38,12 +45,17 @@ func expandDepSpecs(targets map[string]*Target, depMap *workspace.DependencyMap)
 	return dependencies
 }
 
+// findDependeciesByTask gets the list of a targets dependency that execute the passed task
 func findDependenciesByTask(task string, dependencies []string, targets map[string]*Target) []string {
 	res := make([]string, 0)
+	dependenciesExist := len(dependencies) > 0
 
-	if len(dependencies) > 0 {
+	if dependenciesExist {
 		for _, target := range targets {
-			if contains(dependencies, target.PkgName) && target.Task == task {
+			isDependency := contains(dependencies, target.PkgName)
+			executesTask := target.Task == task
+
+			if isDependency && executesTask {
 				res = append(res, target.Id)
 			}
 		}

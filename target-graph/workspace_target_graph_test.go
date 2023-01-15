@@ -18,7 +18,6 @@ func TestWorkspaceTargetGraph_BuildFromPackageAndTaskGraphs(t *testing.T) {
 
 	workspaceGraph := NewWorkspaceTargetGraph(root, packageInfos)
 	workspaceGraph.AddTargetConfig("build", TargetConfig{DependsOn: []string{"^build"}})
-	workspaceGraph.AddTargetConfig("test", TargetConfig{DependsOn: []string{"build"}})
 
 	targetGraph := workspaceGraph.Build([]string{"test"}, nil)
 
