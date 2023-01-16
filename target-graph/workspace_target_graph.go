@@ -44,7 +44,7 @@ func (w WorkspaceTargetGraph) Build(tasks []string, scopes []string) map[string]
 	fullDependencies := expandDepSpecs(w.Graph.targets, w.DependencyMap)
 
 	for _, rel := range fullDependencies {
-		child, parent := rel[0], rel[1]
+		parent, child := rel[0], rel[1]
 		w.Graph.addDependency(parent, child)
 	}
 

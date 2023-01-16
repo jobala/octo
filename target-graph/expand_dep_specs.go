@@ -11,7 +11,7 @@ func expandDepSpecs(targets map[string]*Target, depMap *workspace.DependencyMap)
 		parentNodeId := target.Id
 
 		// All nodes are children of the START_TARGET_ID node
-		dependencies = append(dependencies, []string{parentNodeId, START_TARGET_ID})
+		dependencies = append(dependencies, []string{START_TARGET_ID, parentNodeId})
 
 		if len(tasks) == 0 {
 			continue
@@ -29,13 +29,13 @@ func expandDepSpecs(targets map[string]*Target, depMap *workspace.DependencyMap)
 				// Find all targets that are a dependency of the current target node and executes the current task
 				dependencyTargetIds := findDependenciesByTask(task, targetDependencies, targets)
 				for _, dep := range dependencyTargetIds {
-					dependencies = append(dependencies, []string{dep, parentNodeId})
+					dependencies = append(dependencies, []string{parentNodeId, dep})
 				}
 			} else {
 				targetNodeId := createTargetId(pkgName, taskName)
 
 				if _, nodeExists := targets[targetNodeId]; nodeExists {
-					dependencies = append(dependencies, []string{createTargetId(pkgName, taskName), parentNodeId})
+					dependencies = append(dependencies, []string{parentNodeId, createTargetId(pkgName, taskName)})
 				}
 			}
 		}
@@ -45,7 +45,7 @@ func expandDepSpecs(targets map[string]*Target, depMap *workspace.DependencyMap)
 	return dependencies
 }
 
-// findDependeciesByTask gets the list of a targets dependency that execute the passed task
+// findDependeciesByTask gets a target's dependency list that execute the passed task
 func findDependenciesByTask(task string, dependencies []string, targets map[string]*Target) []string {
 	res := make([]string, 0)
 	dependenciesExist := len(dependencies) > 0
